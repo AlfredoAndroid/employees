@@ -42,7 +42,7 @@
             android:name=".ui.login.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Employees.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
         <activity
             android:name=".ui.detail.DetailActivity"

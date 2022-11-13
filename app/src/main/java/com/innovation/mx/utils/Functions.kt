@@ -2,6 +2,7 @@ package com.innovation.mx.utils
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import com.innovation.mx.models.EmployeeModel
@@ -16,4 +17,5 @@ fun hideKeyboard(activity: Activity) {
 
 object CurrentEmployee {
     var employee: EmployeeModel? = null
+    var image: Bitmap? = null
 }

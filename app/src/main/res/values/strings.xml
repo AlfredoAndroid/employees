@@ -21,6 +21,7 @@
     <string name="settings_text">Change your picture</string>
     <string name="settings_button_gallery">Gallery</string>
     <string name="settings_button_camera">Camera</string>
+    <string name="settings_button_close">Close</string>
 
     <string name="permission_denied">permission_denied</string>
 </resources>

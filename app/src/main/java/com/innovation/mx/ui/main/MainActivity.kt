@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.HomeListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var settingsLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +47,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.HomeListener {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_settings, R.id.nav_logout
+                R.id.nav_settings
             ), drawerLayout
         )
 
@@ -57,20 +61,37 @@ class MainActivity : AppCompatActivity(), HomeFragment.HomeListener {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        val textViewName = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.textView_employee_name)
-        textViewName.text = CurrentEmployee.employee?.name
+        showEmployeeData()
 
         binding.navView.setNavigationItemSelectedListener {
-            when(it.itemId) {
-                R.id.nav_settings -> showSettings()
-                else -> println("logout")
+            if (it.itemId == R.id.nav_settings) {
+                showSettings()
             }
             true
         }
+
+        settingsLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    showEmployeeData()
+                }
+            }
+    }
+
+    private fun showEmployeeData() {
+        val header = binding.navView.getHeaderView(0)
+        val textViewName = header.findViewById<TextView>(R.id.textView_employee_name)
+        val imageView = header.findViewById<ImageView>(R.id.imageView_employee)
+        textViewName.text = CurrentEmployee.employee?.name
+        CurrentEmployee.image?.let {
+            imageView.setImageBitmap(it)
+        }
+
     }
 
     private fun showSettings() {
-        startActivity(
+        binding.drawerLayout.close()
+        settingsLauncher.launch(
             Intent(
                 this,
                 SettingsActivity::class.java

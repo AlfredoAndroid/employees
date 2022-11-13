@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.innovation.mx.R
 import com.innovation.mx.databinding.ActivitySettingsBinding
+import com.innovation.mx.utils.CurrentEmployee
 import com.innovation.mx.utils.showMessage
 import java.io.File
 import java.io.IOException
@@ -58,6 +59,10 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
 
+            buttonClose.setOnClickListener {
+                finish()
+            }
+
             galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     try {
@@ -65,6 +70,8 @@ class SettingsActivity : AppCompatActivity() {
                         targetUri?.let {
                             val bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(it))
                             imageView.setImageBitmap(bitmap)
+                            CurrentEmployee.image = bitmap
+                            setResult(RESULT_OK)
                         }
                     } catch (e: java.lang.Exception) {
                         e.printStackTrace()
@@ -75,10 +82,10 @@ class SettingsActivity : AppCompatActivity() {
             cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     try {
-                        val photoFile = createImageFile();
-                        val bitmapOptions = BitmapFactory.Options()
-                        var bitmap = BitmapFactory.decodeFile(photoFile?.getAbsolutePath(), bitmapOptions)
+                        val bitmap = result.data?.extras?.get("data") as Bitmap
                         imageView.setImageBitmap(bitmap)
+                        CurrentEmployee.image = bitmap
+                        setResult(RESULT_OK)
                     } catch (e: java.lang.Exception) {
                         e.printStackTrace()
                     }
@@ -107,36 +114,4 @@ class SettingsActivity : AppCompatActivity() {
             openCamera()
         }
     }
-
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        // Create an image file name
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File.createTempFile(
-            imageFileName,  /* prefix */
-            ".jpg",  /* suffix */
-            storageDir /* directory */
-        )
-
-        // Save a file: path for use with ACTION_VIEW intents
-        //currentPhotoPath = image.absolutePath
-        return image
-    }
-
-    private fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap? {
-        var width = image.width
-        var height = image.height
-        val bitmapRatio = width.toFloat() / height.toFloat()
-        if (bitmapRatio > 1) {
-            width = maxSize
-            height = (width / bitmapRatio).toInt()
-        } else {
-            height = maxSize
-            width = (height * bitmapRatio).toInt()
-        }
-        return Bitmap.createScaledBitmap(image, width, height, true)
-    }
-
 }
